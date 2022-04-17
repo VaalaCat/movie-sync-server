@@ -115,7 +115,7 @@ func (r *RoomImpl) GetMaxTime() int {
 }
 
 func (r *RoomImpl) AddUser(user *User, socket *socketio.Conn) {
-	r.users[(*user).Name()] = user
+	r.users[(*socket).ID()] = user
 	server.JoinRoom("/", r.name, *socket)
 }
 
@@ -256,7 +256,7 @@ func main() {
 		}
 	})
 
-	// 如果用户回复了时间则将每个用户的时间更新到对应的用户并广播最大值和最小值
+	// 如果用户回复了时间则将对应用户时间更新
 	server.OnEvent("/", "time", func(s socketio.Conn, msg string) {
 		log.Println("time:", msg)
 		Spited := strings.Split(msg, ":")
@@ -264,18 +264,29 @@ func main() {
 		username := s.ID()
 		for _, r := range Cinema {
 			if (*r).Name() == room {
-				for _, u := range (*r).GetUsers() {
-					if (*u).Name() == username {
-						tmpTime := strings.Split(time, ".")
-						timeNum, err := strconv.Atoi(tmpTime[0])
-						if err != nil {
-							log.Println("time is not a number")
-						} else {
-							(*u).SetTime(timeNum)
-						}
+				u := (*r).GetUser(username)
+				if u != nil {
+					tmpTime := strings.Split(time, ".")
+					timeNum, err := strconv.Atoi(tmpTime[0])
+					if err != nil {
+						log.Println("time is not a number", err)
+					} else {
+						(*u).SetTime(timeNum)
 					}
 				}
-				(*r).Broadcast("sync", fmt.Sprintf("%d:%d", (*r).GetMinTime(), (*r).GetMaxTime()))
+				break
+			}
+		}
+	})
+
+	// 如果接收到sync请求则发送时间的最大最小值
+	server.OnEvent("/", "sync", func(s socketio.Conn, msg string) {
+		log.Println("sync:", msg)
+		Spited := strings.Split(msg, ":")
+		room, _ := Spited[0], Spited[1]
+		for _, r := range Cinema {
+			if (*r).Name() == room {
+				s.Emit("sync", fmt.Sprintf("%d:%d", (*r).GetMinTime(), (*r).GetMaxTime()))
 				break
 			}
 		}
@@ -297,7 +308,6 @@ func main() {
 			}
 		}
 	})
-
 	// 如果有用户发出setTime请求则使用sync消息将所有用户的时间同步
 	server.OnEvent("/", "setTime", func(s socketio.Conn, msg string) {
 		log.Println("setTime:", msg)
