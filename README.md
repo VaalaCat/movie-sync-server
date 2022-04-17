@@ -1,6 +1,6 @@
 # 多人在线电影院
 
-> 这是后端代码仓库，可执行文件请在这里下载 [https://github.com/VaalaCat/movie-sync-server/release](https://github.com/VaalaCat/movie-sync-server/release)
+> 这是后端代码仓库，可执行文件请在这里下载 [https://github.com/VaalaCat/movie-sync-server/releases](https://github.com/VaalaCat/movie-sync-server/releases)
 
 > 前端代码仓库，请访问 [https://github.com/VaalaCat/movie-sync](https://github.com/VaalaCat/movie-sync)
 
