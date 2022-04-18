@@ -1,12 +1,14 @@
 # 多人在线电影院
 
+> 演示地址: [http://82.157.94.120:9999/](http://82.157.94.120:9999/) 不保证可用性，有需要的同学请自行搭建服务
+
+> 测试用视频地址：[https://media.w3.org/2010/05/sintel/trailer.mp4](https://media.w3.org/2010/05/sintel/trailer.mp4)
+
 > 这是后端代码仓库，可执行文件请在这里下载 [https://github.com/VaalaCat/movie-sync-server/releases](https://github.com/VaalaCat/movie-sync-server/releases)
 
 > 前端代码仓库，请访问 [https://github.com/VaalaCat/movie-sync](https://github.com/VaalaCat/movie-sync)
 
 > 博客原文：[https://vaala.cat/2022/04/17/%E5%BC%82%E5%9C%B0%E5%A4%9A%E4%BA%BA%E5%9C%A8%E7%BA%BF%E7%94%B5%E5%BD%B1%E9%99%A2/](https://vaala.cat/2022/04/17/%E5%BC%82%E5%9C%B0%E5%A4%9A%E4%BA%BA%E5%9C%A8%E7%BA%BF%E7%94%B5%E5%BD%B1%E9%99%A2/) 
-
-> 演示地址: [http://82.157.94.120:9999/](http://82.157.94.120:9999/) 不保证可用性，有需要的同学请自行搭建服务
 
 ## 引言
 
