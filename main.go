@@ -207,7 +207,7 @@ func main() {
 	//连接后必须加入房间
 	server.OnEvent("/", "join", func(s socketio.Conn, msg string) {
 		log.Println("join:", msg)
-		Spited := strings.Split(msg, ":")
+		Spited := strings.Split(msg, ":::")
 		room, showName := Spited[0], Spited[1]
 		username := s.ID()
 		//首先判断当前用户是否想要加入已有的房间，如果房间不存在则新建房间
@@ -240,17 +240,18 @@ func main() {
 			joinedRoom = newRoom
 			Cinema = append(Cinema, &newRoom)
 		}
-		joinedRoom.Broadcast("join", username)
+		joinedRoom.Broadcast("join", showName)
 	})
 
 	// 设置房间的视频地址
 	server.OnEvent("/", "setUrl", func(s socketio.Conn, msg string) {
 		log.Println("setUrl:", msg)
 		Spited := strings.Split(msg, ":::")
-		room, url := Spited[0], Spited[1]
+		room, showName, url := Spited[0], Spited[1], Spited[2]
 		for _, r := range Cinema {
 			if (*r).Name() == room {
 				(*r).SetUrl(url)
+				(*r).Broadcast("setUrl", fmt.Sprintf("%s:::%s", showName, url))
 				break
 			}
 		}
@@ -259,7 +260,7 @@ func main() {
 	// 如果用户回复了时间则将对应用户时间更新
 	server.OnEvent("/", "time", func(s socketio.Conn, msg string) {
 		log.Println("time:", msg)
-		Spited := strings.Split(msg, ":")
+		Spited := strings.Split(msg, ":::")
 		room, _, time := Spited[0], Spited[1], Spited[2]
 		username := s.ID()
 		for _, r := range Cinema {
@@ -282,11 +283,11 @@ func main() {
 	// 如果接收到sync请求则发送时间的最大最小值
 	server.OnEvent("/", "sync", func(s socketio.Conn, msg string) {
 		log.Println("sync:", msg)
-		Spited := strings.Split(msg, ":")
-		room, _ := Spited[0], Spited[1]
+		Spited := strings.Split(msg, ":::")
+		room, showName := Spited[0], Spited[1]
 		for _, r := range Cinema {
 			if (*r).Name() == room {
-				s.Emit("sync", fmt.Sprintf("%d:%d", (*r).GetMinTime(), (*r).GetMaxTime()))
+				(*r).Broadcast("sync", fmt.Sprintf("%d:::%d:::%s", (*r).GetMinTime(), (*r).GetMaxTime(), showName))
 				break
 			}
 		}
@@ -295,27 +296,27 @@ func main() {
 	// 如果有用户发出getTime请求则开始广播getTime请求
 	server.OnEvent("/", "getTime", func(s socketio.Conn, msg string) {
 		log.Println("getTime:", msg)
-		Spited := strings.Split(msg, ":")
-		room, _ := Spited[0], Spited[1]
+		Spited := strings.Split(msg, ":::")
+		room, showName := Spited[0], Spited[1]
 		username := s.ID()
 		for _, r := range Cinema {
 			if (*r).Name() == room {
 				tmpUser := (*r).GetUser(username)
 				if tmpUser != nil {
-					(*r).Broadcast("getTime", (*tmpUser).GetUserName())
+					(*r).Broadcast("getTime", showName)
 					break
 				}
 			}
 		}
 	})
-	// 如果有用户发出setTime请求则使用sync消息将所有用户的时间同步
+	// 如果有用户发出setTime请求则使用setTime消息将所有用户的时间同步
 	server.OnEvent("/", "setTime", func(s socketio.Conn, msg string) {
 		log.Println("setTime:", msg)
-		Spited := strings.Split(msg, ":")
-		room, _, time := Spited[0], Spited[1], Spited[2]
+		Spited := strings.Split(msg, ":::")
+		room, showName, time := Spited[0], Spited[1], Spited[2]
 		for _, r := range Cinema {
 			if (*r).Name() == room {
-				(*r).Broadcast("setTime", time)
+				(*r).Broadcast("setTime", fmt.Sprintf("%s:::%s", showName, time))
 				for _, u := range (*r).GetUsers() {
 					tmpTime := strings.Split(time, ".")
 					timeNum, err := strconv.Atoi(tmpTime[0])
@@ -333,7 +334,7 @@ func main() {
 	// 用户发出getUsers请求则返回所有的用户名
 	server.OnEvent("/", "getUsers", func(s socketio.Conn, msg string) {
 		log.Println("getUsers:", msg)
-		Spited := strings.Split(msg, ":")
+		Spited := strings.Split(msg, ":::")
 		room, _ := Spited[0], Spited[1]
 		hasRoom := false
 		for _, r := range Cinema {
@@ -376,6 +377,8 @@ func main() {
 				(*r).RemoveUser(s.ID())
 				if len((*r).GetUsers()) == 0 {
 					Cinema = append(Cinema[:i], Cinema[i+1:]...)
+				} else {
+					(*r).Broadcast("leaveRoom", s.ID())
 				}
 			}
 		}
