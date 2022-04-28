@@ -43,6 +43,6 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - |
       ssh $SSH_USERNAME@$SSH_TARGET "cd $DEPLOY_PATH/../ && docker-compose down"
-      ssh $SSH_USERNAME@$SSH_TARGET "rm -rf $DEPLOY_PATH/*"
+      ssh $SSH_USERNAME@$SSH_TARGET "rm -rf $DEPLOY_PATH && mkdir -p $DEPLOY_PATH"
       scp artifacts/movie-sync-server $SSH_USERNAME@$SSH_TARGET:$DEPLOY_PATH/
       ssh $SSH_USERNAME@$SSH_TARGET "cd $DEPLOY_PATH/ && chmod +x movie-sync-server && cd .. && docker-compose up -d"
