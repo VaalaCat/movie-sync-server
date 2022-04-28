@@ -15,7 +15,6 @@
 
 stages:          # List of stages for jobs, and their order of execution
   - build
-  - test
   - deploy
 
 build-job:       # This job runs in the build stage, which runs first.
@@ -29,3 +28,21 @@ build-job:       # This job runs in the build stage, which runs first.
     paths:
       - artifacts
     expire_in: 1 hour
+
+deploy-job:      # This job runs in the deploy stage.
+  image: python:3.6
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  before_script:
+    - |
+      which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )
+      eval $(ssh-agent -s)
+      echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+      mkdir -p ~/.ssh
+      chmod 700 ~/.ssh
+      ssh-keyscan $SSH_TARGET >> ~/.ssh/known_hosts
+  script:
+    - |
+      ssh $SSH_USERNAME@$SSH_TARGET "cd $DEPLOY_PATH/../ && docker-compose down"
+      ssh $SSH_USERNAME@$SSH_TARGET "rm -rf $DEPLOY_PATH/*"
+      scp movie-sync-server $SSH_USERNAME@$SSH_TARGET:$DEPLOY_PATH/
+      ssh $SSH_USERNAME@$SSH_TARGET "cd $DEPLOY_PATH/ && chmod +x movie-sync-server && cd .. && docker-compose up -d"
