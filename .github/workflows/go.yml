@@ -1,0 +1,27 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - name: Build
+      run: |
+        GOOS=linux GOARCH=mipsle go build -o movie-sync-server-linux-mipsle
+        GOOS=linux GOARCH=amd64 go build -o movie-sync-server-linux-amd64
+        GOOS=linux GOARCH=arm64 go build -o movie-sync-server-linux-arm64
+        GOOS=linux GOARCH=mips go build -o movie-sync-server-linux-mips
+        GOOS=windows GOARCH=amd64 go build -o movie-sync-server-win-amd64.exe
