@@ -19,11 +19,11 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
-  image: golang:1.18.1-alpine
+  image: golang:1.18.1
   script:
     - |
       mkdir -p artifacts
-      GOPROXY=https://goproxy.cn,direct go build -o artifacts ./...
+      CGO_ENABLED=0 GOPROXY=https://goproxy.cn,direct go build -o artifacts ./...
   artifacts:
     paths:
       - artifacts
