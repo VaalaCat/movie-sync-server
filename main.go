@@ -432,8 +432,8 @@ func main() {
 	router.StaticFile("/movie/login", "../asset/index.html")
 	router.StaticFS("/movie/css", http.Dir("../asset/css"))
 	router.StaticFS("/movie/js", http.Dir("../asset/js"))
-	router.GET("/movie/room/*any", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/movie")
+	router.NoRoute(func(c *gin.Context) {
+		c.File("../asset/index.html")
 	})
 	if err := router.Run(fmt.Sprintf(":%s", port)); err != nil {
 		log.Fatal("failed run app: ", err)
