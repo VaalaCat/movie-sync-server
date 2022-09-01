@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	socketio "github.com/googollee/go-socket.io"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	socketio "github.com/googollee/go-socket.io"
+	"github.com/joho/godotenv"
 )
 
 func GinMiddleware(allowOrigin string) gin.HandlerFunc {
@@ -418,7 +419,7 @@ func main() {
 	// 从.env文件中读取端口号
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 	port := os.Getenv("PORT")
 	allowOrigin := os.Getenv("ALLOW_ORIGIN")
