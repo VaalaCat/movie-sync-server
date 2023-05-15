@@ -1,11 +1,10 @@
 package room
 
 import (
-	"log"
-
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/sirupsen/logrus"
 )
 
 func ErrorEndpoint(s socketio.Conn, e error) {
-	log.Println("meet error:", e)
+	logrus.Println("meet error:", e)
 }

@@ -1,14 +1,14 @@
 package room
 
 import (
-	"log"
 	"movie-sync-server/entities"
 
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/sirupsen/logrus"
 )
 
 func GetUrlEndpoint(s socketio.Conn, msg string) {
-	log.Println("getUrl:", msg)
+	logrus.Println("getUrl:", msg)
 	room := msg
 	for _, r := range entities.Cinema {
 		if (*r).Name() == room {

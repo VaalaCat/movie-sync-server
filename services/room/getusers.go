@@ -1,15 +1,15 @@
 package room
 
 import (
-	"log"
 	"movie-sync-server/entities"
 	"strings"
 
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/sirupsen/logrus"
 )
 
 func GetUsersEndpoint(s socketio.Conn, msg string) {
-	log.Println("getUsers:", msg)
+	logrus.Println("getUsers:", msg)
 	Splitted := strings.Split(msg, ":::")
 	room, _ := Splitted[0], Splitted[1]
 	hasRoom := false
