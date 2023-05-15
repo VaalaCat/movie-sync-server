@@ -2,17 +2,17 @@ package room
 
 import (
 	"fmt"
-	"log"
 	"movie-sync-server/entities"
 	"strconv"
 	"strings"
 
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/sirupsen/logrus"
 )
 
 func SetTimeEndpoint(s socketio.Conn, msg string) {
 	server := entities.GetServer()
-	log.Println("setTime:", msg)
+	logrus.Println("setTime:", msg)
 	Splitted := strings.Split(msg, ":::")
 	room, showName, time := Splitted[0], Splitted[1], Splitted[2]
 	for _, r := range entities.Cinema {
@@ -22,7 +22,7 @@ func SetTimeEndpoint(s socketio.Conn, msg string) {
 				tmpTime := strings.Split(time, ".")
 				timeNum, err := strconv.Atoi(tmpTime[0])
 				if err != nil {
-					log.Println("time is not a number")
+					logrus.Println("time is not a number")
 				} else {
 					(*u).SetTime(timeNum)
 				}

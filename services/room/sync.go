@@ -2,16 +2,16 @@ package room
 
 import (
 	"fmt"
-	"log"
 	"movie-sync-server/entities"
 	"strings"
 
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/sirupsen/logrus"
 )
 
 func SyncEndpoint(s socketio.Conn, msg string) {
 	server := entities.GetServer()
-	log.Println("sync:", msg)
+	logrus.Println("sync:", msg)
 	Splitted := strings.Split(msg, ":::")
 	room, showName := Splitted[0], Splitted[1]
 	for _, r := range entities.Cinema {

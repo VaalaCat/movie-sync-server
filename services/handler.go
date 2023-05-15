@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"log"
 	"movie-sync-server/conf"
 	"movie-sync-server/entities"
 	"movie-sync-server/services/room"
@@ -10,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func EventHandler() {
@@ -41,7 +41,7 @@ func EventHandler() {
 
 	go func() {
 		if err := server.Serve(); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
+			logrus.Fatalf("socketio listen error: %s\n", err)
 		}
 	}()
 }
@@ -68,7 +68,7 @@ func RouterHandler() {
 func Run() {
 	router := entities.GetRouter()
 	if err := router.Run(fmt.Sprintf(":%s", conf.ServerSetting.Port)); err != nil {
-		log.Fatal("failed run app: ", err)
+		logrus.Fatal("failed run app: ", err)
 	}
 	defer entities.GetServer().Close()
 }

@@ -1,15 +1,15 @@
 package room
 
 import (
-	"log"
 	"movie-sync-server/entities"
 
 	socketio "github.com/googollee/go-socket.io"
+	"github.com/sirupsen/logrus"
 )
 
 func DisconnectEndpoint(s socketio.Conn, msg string) {
 	server := entities.GetServer()
-	log.Println("closed", msg)
+	logrus.Println("closed", msg)
 	if len(entities.Cinema) > 0 {
 		for i, r := range entities.Cinema {
 			(*r).RemoveUser(s.ID(), server)
