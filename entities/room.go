@@ -1,6 +1,8 @@
 package entities
 
 import (
+	"time"
+
 	socketio "github.com/googollee/go-socket.io"
 )
 
@@ -21,9 +23,11 @@ type Room interface {
 }
 
 type RoomImpl struct {
-	name  string
-	url   string
-	users map[string]*User
+	name     string
+	url      string
+	users    map[string]*User
+	lastPlay time.Time
+	lastStop time.Time
 }
 
 func (r *RoomImpl) Name() string {
@@ -32,6 +36,8 @@ func (r *RoomImpl) Name() string {
 
 func (r *RoomImpl) SetName(name string) {
 	r.name = name
+	r.lastPlay = time.Now()
+	r.lastStop = time.Now()
 }
 
 func (r *RoomImpl) SetUrl(url string) {
@@ -84,6 +90,15 @@ func (r *RoomImpl) RemoveUser(username string, server *socketio.Server) {
 }
 
 func (r *RoomImpl) Broadcast(event string, message string, server *socketio.Server) {
+	if event == "play" {
+		r.lastPlay = time.Now()
+	}
+	if event == "pause" {
+		r.lastStop = time.Now()
+	}
+	if time.Duration(r.lastStop.Sub(r.lastPlay)).Abs() < 300*time.Microsecond {
+		return
+	}
 	server.BroadcastToRoom("/", r.name, event, message)
 }
 
